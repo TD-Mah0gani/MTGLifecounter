@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MTG Life Counter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <h1>MTG Life Counter</h1>
+
+    <div class="player">
+      <h2>Player 1</h2>
+      <div class="life" id="p1-life">40</div>
+      <div class="buttons">
+        <button data-player="1" data-change="1">+1</button>
+        <button data-player="1" data-change="-1">-1</button>
+        <button data-player="1" data-reset="true">Reset</button>
+      </div>
+    </div>
+
+    <div class="player">
+      <h2>Player 2</h2>
+      <div class="life" id="p2-life">40</div>
+      <div class="buttons">
+        <button data-player="2" data-change="1">+1</button>
+        <button data-player="2" data-change="-1">-1</button>
+        <button data-player="2" data-reset="true">Reset</button>
+      </div>
+    </div>
+  </div>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+
+
+  <script src="script.js"></script>
+</body>
+</html>
