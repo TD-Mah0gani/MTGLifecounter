@@ -1,10 +1,10 @@
-const CACHE_NAME = 'mtg-lifecounter-v1';
+const CACHE_NAME = 'mtg-lifecounter-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
