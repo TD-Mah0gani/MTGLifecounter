@@ -30,3 +30,40 @@ button {
   padding: 10px 20px;
   margin: 5px;
 }
+
+.four-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.quad {
+  background: #222;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.quad h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.quad .life {
+  font-size: 5rem;
+  margin: 15px 0;
+}
+
+.quad button {
+  font-size: 2rem;
+  padding: 15px 25px;
+  margin: 10px;
+}
