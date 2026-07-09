@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mtg-lifecounter-v2';
+const CACHE_NAME = 'mtg-lifecounter-v3';
 const ASSETS = [
   './',
   './index.html',
