@@ -34,6 +34,16 @@ button {
   margin: 5px;
 }
 
+.reset-btn {
+  margin: 0 30px;
+  background: #444;
+  color: #fff;
+  border: 2px solid #666;
+  padding: 15px 30px;
+  border-radius: 8px;
+}
+
+
 .four-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -84,4 +94,12 @@ button {
 #two-player {
   height: calc(100vh - 120px);
   overflow: hidden;
+}
+
+button[data-change="5"] {
+  background: #2a6;
+}
+
+button[data-change="-5"] {
+  background: #a22;
 }
