@@ -35,7 +35,8 @@ button {
 }
 
 .reset-btn {
-  margin: 0 30px;
+  flex: 1.5;
+  margin: 0 20px;
   background: #444;
   color: #fff;
   border: 2px solid #666;
@@ -102,4 +103,23 @@ button[data-change="5"] {
 
 button[data-change="-5"] {
   background: #a22;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.buttons button {
+  flex: 1;
+  min-width: 0;
+  margin: 0 5px;
+}
+
+.quad .buttons {
+  margin-top: 20px;
 }
