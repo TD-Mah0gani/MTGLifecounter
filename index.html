@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,24 +7,22 @@
 </head>
 <body>
   <div class="app">
-    <h1>MTG Life Counter</h1>
 
+    <!-- Title + Toggle (only visible in 2-player mode) -->
+    <h1 id="title">MTG Life Counter</h1>
     <button id="toggle-mode">Switch to 4 Player Mode</button>
 
-    
+    <!-- 2 Player Layout -->
     <div id="two-player">
-      <button id="menu-btn">☰</button>
       <div class="player">
         <h2>Player 1</h2>
         <div class="life" id="p1-life">40</div>
         <div class="buttons">
           <button data-player="p1" data-change="5">+5</button>
-            <button data-player="p1" data-change="1">+1</button>
-
-            <button class="reset-btn" data-player="p1" data-reset="true">⟲</button>
-
-            <button data-player="p1" data-change="-1">−1</button>
-            <button data-player="p1" data-change="-5">−5</button>
+          <button data-player="p1" data-change="1">+1</button>
+          <button class="reset-btn" data-player="p1" data-reset="true">⟲</button>
+          <button data-player="p1" data-change="-1">−1</button>
+          <button data-player="p1" data-change="-5">−5</button>
         </div>
       </div>
 
@@ -34,80 +32,72 @@
         <div class="buttons">
           <button data-player="p2" data-change="5">+5</button>
           <button data-player="p2" data-change="1">+1</button>
-
           <button class="reset-btn" data-player="p2" data-reset="true">⟲</button>
-
           <button data-player="p2" data-change="-1">−1</button>
           <button data-player="p2" data-change="-5">−5</button>
         </div>
       </div>
     </div>
 
-  <div id="four-player" class="hidden four-grid">
-    <button id="menu-btn">☰</button>
-    <div class="quad" id="quad-p1">
-      <h2>Player 1</h2>
-      <div class="life" id="p1-life-4">40</div>
+    <!-- 4 Player Layout (FULL SCREEN GRID) -->
+    <div id="four-player" class="hidden four-grid">
+
+      <!-- CENTER MENU BUTTON -->
+      <button id="menu-btn">☰</button>
+
+      <div class="quad" id="quad-p1">
+        <h2>Player 1</h2>
+        <div class="life" id="p1-life-4">40</div>
         <div class="buttons">
           <button data-player="p1" data-change="5">+5</button>
           <button data-player="p1" data-change="1">+1</button>
-
           <button class="reset-btn" data-player="p1" data-reset="true">⟲</button>
-
           <button data-player="p1" data-change="-1">−1</button>
           <button data-player="p1" data-change="-5">−5</button>
         </div>
-    </div>
+      </div>
 
-    <div class="quad" id="quad-p2">
-      <h2>Player 2</h2>
-      <div class="life" id="p2-life-4">40</div>
+      <div class="quad" id="quad-p2">
+        <h2>Player 2</h2>
+        <div class="life" id="p2-life-4">40</div>
         <div class="buttons">
           <button data-player="p2" data-change="5">+5</button>
           <button data-player="p2" data-change="1">+1</button>
-
           <button class="reset-btn" data-player="p2" data-reset="true">⟲</button>
-
           <button data-player="p2" data-change="-1">−1</button>
           <button data-player="p2" data-change="-5">−5</button>
         </div>
-    </div>
+      </div>
 
-    <div class="quad" id="quad-p3">
-      <h2>Player 3</h2>
-      <div class="life" id="p3-life-4">40</div>
+      <div class="quad" id="quad-p3">
+        <h2>Player 3</h2>
+        <div class="life" id="p3-life-4">40</div>
         <div class="buttons">
           <button data-player="p3" data-change="5">+5</button>
           <button data-player="p3" data-change="1">+1</button>
-
           <button class="reset-btn" data-player="p3" data-reset="true">⟲</button>
-
           <button data-player="p3" data-change="-1">−1</button>
           <button data-player="p3" data-change="-5">−5</button>
         </div>
-    </div>
+      </div>
 
-    <div class="quad" id="quad-p4">
-      <h2>Player 4</h2>
-      <div class="life" id="p4-life-4">40</div>
+      <div class="quad" id="quad-p4">
+        <h2>Player 4</h2>
+        <div class="life" id="p4-life-4">40</div>
         <div class="buttons">
           <button data-player="p4" data-change="5">+5</button>
           <button data-player="p4" data-change="1">+1</button>
-
           <button class="reset-btn" data-player="p4" data-reset="true">⟲</button>
-
           <button data-player="p4" data-change="-1">−1</button>
           <button data-player="p4" data-change="-5">−5</button>
         </div>
+      </div>
+
     </div>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111111">
+    <script src="script.js"></script>
   </div>
-
-
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111111">
-
-
-  <script src="script.js"></script>
 </body>
 </html>
