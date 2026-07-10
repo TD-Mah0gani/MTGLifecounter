@@ -53,6 +53,8 @@ button {
   height: calc(100vh - 120px);
   padding: 10px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 .quad {
@@ -116,3 +118,30 @@ button {
 .quad .buttons {
   margin-top: 20px;
 }
+
+.app {
+  position: relative;
+}
+
+#menu-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #333;
+  color: #fff;
+  border: 3px solid #666;
+
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}
+
