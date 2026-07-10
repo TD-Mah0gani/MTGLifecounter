@@ -1,3 +1,6 @@
+// -----------------------------
+// LIFE TOTALS (LOCAL STORAGE)
+// -----------------------------
 let p1Life = Number(localStorage.getItem('p1Life')) || 40;
 let p2Life = Number(localStorage.getItem('p2Life')) || 40;
 
@@ -7,6 +10,9 @@ let p3Life4 = Number(localStorage.getItem('p3Life4')) || 40;
 let p4Life4 = Number(localStorage.getItem('p4Life4')) || 40;
 
 
+// -----------------------------
+// UPDATE DISPLAY
+// -----------------------------
 function updateDisplay() {
   // 2-player
   document.getElementById('p1-life').textContent = p1Life;
@@ -20,6 +26,9 @@ function updateDisplay() {
 }
 
 
+// -----------------------------
+// BUTTON CLICK HANDLER
+// -----------------------------
 document.addEventListener('click', (event) => {
   const btn = event.target;
   if (btn.tagName !== 'BUTTON') return;
@@ -36,7 +45,9 @@ document.addEventListener('click', (event) => {
     localStorage.setItem('p4Life4', p4Life4);
   }
 
+  // RESET BUTTON
   if (btn.dataset.reset) {
+
     // 2-player resets
     if (player === '1') p1Life = 40;
     if (player === '2') p2Life = 40;
@@ -49,7 +60,8 @@ document.addEventListener('click', (event) => {
 
     saveAll();
 
-  } else {
+  } else if (btn.dataset.change) {
+
     const change = Number(btn.dataset.change);
 
     // 2-player changes
@@ -69,30 +81,74 @@ document.addEventListener('click', (event) => {
 });
 
 
+// -----------------------------
+// SERVICE WORKER
+// -----------------------------
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
     .catch(console.error);
 }
 
+
+// -----------------------------
+// MODE SWITCHING (NOW IN MENU)
+// -----------------------------
 const twoPlayerDiv = document.getElementById('two-player');
 const fourPlayerDiv = document.getElementById('four-player');
 const toggleBtn = document.getElementById('toggle-mode');
 
-let mode4 = false;
+// -----------------------------
+// MENU BUTTON + POPUP
+// -----------------------------
+const menuBtn = document.getElementById('menu-btn');
+const menuPanel = document.getElementById('menu-panel');
+const closeMenu = document.getElementById('close-menu');
 
+// Open menu
+menuBtn.addEventListener('click', () => {
+  menuPanel.classList.remove('hidden');
+});
+
+// Close menu
+closeMenu.addEventListener('click', () => {
+  menuPanel.classList.add('hidden');
+});
+
+
+// -----------------------------
+// TOGGLE MODE (INSIDE MENU)
+// -----------------------------
 toggleBtn.addEventListener('click', () => {
-  mode4 = !mode4;
 
-  if (mode4) {
+  if (fourPlayerDiv.classList.contains('hidden')) {
+    // Switch to 4-player
     twoPlayerDiv.classList.add('hidden');
     fourPlayerDiv.classList.remove('hidden');
     toggleBtn.textContent = "Switch to 2 Player Mode";
   } else {
+    // Switch to 2-player
     fourPlayerDiv.classList.add('hidden');
     twoPlayerDiv.classList.remove('hidden');
     toggleBtn.textContent = "Switch to 4 Player Mode";
   }
+
+  // Close menu after switching
+  menuPanel.classList.add('hidden');
 });
 
 
+// -----------------------------
+// START IN 4-PLAYER MODE
+// -----------------------------
+twoPlayerDiv.classList.add('hidden');
+fourPlayerDiv.classList.remove('hidden');
+
+// Remove title if it exists
+const title = document.getElementById('title');
+if (title) title.remove();
+
+
+// -----------------------------
+// INITIAL DISPLAY UPDATE
+// -----------------------------
 updateDisplay();
