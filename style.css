@@ -5,56 +5,28 @@ html, body {
   height: 100%;
 }
 
-body {
-  background: #111;
-  color: #fff;
-  font-family: system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
 }
 
-.player {
-  margin: 20px 0;
-}
-
-.life {
-  font-size: 4rem;
-  margin: 10px 0;
-}
-
+/* Hide title + toggle in 4-player mode */
 .hidden {
   display: none !important;
 }
 
-button {
-  font-size: 1.5rem;
-  padding: 10px 20px;
-  margin: 5px;
-}
-
-.reset-btn {
-  flex: 1.4;
-  margin: 0 20px;
-  background: #444;
-  color: #fff;
-  border: 2px solid #666;
-  padding: 15px 0;
-  border-radius: 8px;
-}
-
+/* FULL SCREEN 4-PLAYER GRID */
 .four-grid {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 10px;
   width: 100vw;
-  height: calc(100vh - 120px);
+  height: 100vh;
+  gap: 10px;
   padding: 10px;
   box-sizing: border-box;
-  position: relative;
-  z-index: 1;
 }
 
 .quad {
@@ -65,64 +37,9 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
 }
 
-.quad h2 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-.quad .life {
-  font-size: 5rem;
-  margin: 15px 0;
-}
-
-.quad button {
-  font-size: 2rem;
-  padding: 15px 25px;
-  margin: 10px;
-}
-
-.app {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-
-#two-player {
-  height: calc(100vh - 120px);
-  overflow: hidden;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  flex-wrap: nowrap;
-  gap: 10px;
-}
-
-.buttons button {
-  flex: 1;
-  min-width: 0;
-  font-size: 2rem;
-  padding: 15px 0;
-}
-
-.quad .buttons {
-  margin-top: 20px;
-}
-
-.app {
-  position: relative;
-}
-
+/* CENTER MENU BUTTON */
 #menu-btn {
   position: absolute;
   top: 50%;
@@ -136,10 +53,36 @@ button {
   background: #333;
   color: #fff;
   border: 3px solid #666;
-
   font-size: 2.5rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+/* Buttons */
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.buttons button {
+  flex: 1;
+  min-width: 0;
+  font-size: 2rem;
+  padding: 15px 0;
+}
+
+.reset-btn {
+  flex: 1.4;
+  margin: 0 20px;
+  background: #444;
+  color: #fff;
+  border: 2px solid #666;
+  padding: 15px 0;
+  border-radius: 8px;
+}
