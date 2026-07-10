@@ -147,7 +147,8 @@ html, body {
 }
 
 /* CENTER MENU BUTTON */
-#menu-btn {
+#menu-btn,
+.menu-btn {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -166,6 +167,7 @@ html, body {
   justify-content: center;
   align-items: center;
 }
+
 
 /* POPUP MENU */
 #menu-panel {
