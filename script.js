@@ -97,16 +97,20 @@ const twoPlayerDiv = document.getElementById('two-player');
 const fourPlayerDiv = document.getElementById('four-player');
 const toggleBtn = document.getElementById('toggle-mode');
 
+
 // -----------------------------
-// MENU BUTTON + POPUP
+// MENU BUTTON + POPUP (OPTION B FIX)
 // -----------------------------
-const menuBtn = document.getElementById('menu-btn');
 const menuPanel = document.getElementById('menu-panel');
 const closeMenu = document.getElementById('close-menu');
 
-// Open menu
-menuBtn.addEventListener('click', () => {
-  menuPanel.classList.remove('hidden');
+// Listen to BOTH menu buttons:
+// - The main one: id="menu-btn"
+// - Any duplicates: class="menu-btn"
+document.querySelectorAll('#menu-btn, .menu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    menuPanel.classList.remove('hidden');
+  });
 });
 
 // Close menu
