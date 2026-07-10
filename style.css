@@ -96,14 +96,6 @@ button {
   overflow: hidden;
 }
 
-button[data-change="5"] {
-  background: #2a6;
-}
-
-button[data-change="-5"] {
-  background: #a22;
-}
-
 .buttons {
   display: flex;
   flex-direction: row;
