@@ -1,7 +1,4 @@
-/* --------------------------------------------------
-   GLOBAL
--------------------------------------------------- */
-
+/* GLOBAL */
 html, body {
   margin: 0;
   padding: 0;
@@ -21,10 +18,7 @@ html, body {
   display: none !important;
 }
 
-/* --------------------------------------------------
-   HOME SCREEN
--------------------------------------------------- */
-
+/* HOME SCREEN */
 #home-screen {
   width: 100%;
   height: 100%;
@@ -78,17 +72,14 @@ html, body {
   background: #0088cc;
 }
 
-/* --------------------------------------------------
-   GAME SCREEN
--------------------------------------------------- */
-
+/* GAME SCREEN */
 #game-screen {
   width: 100%;
   height: 100%;
   position: relative;
 }
 
-/* Player grid (dynamic layout) */
+/* Player grid */
 #player-grid {
   width: 100%;
   height: 100%;
@@ -96,10 +87,7 @@ html, body {
   gap: 0;
 }
 
-/* --------------------------------------------------
-   PLAYER ZONES
--------------------------------------------------- */
-
+/* PLAYER ZONES */
 .player-zone {
   position: relative;
   background-size: cover;
@@ -118,7 +106,6 @@ html, body {
   box-shadow: inset 0 0 20px rgba(0, 150, 255, 0.4);
 }
 
-/* Player name */
 .player-name {
   font-size: 2.2rem;
   font-weight: bold;
@@ -129,7 +116,6 @@ html, body {
   color: white;
 }
 
-/* Life total */
 .life-total {
   font-size: 6rem;
   font-weight: bold;
@@ -140,7 +126,6 @@ html, body {
   color: white;
 }
 
-/* Buttons row */
 .buttons {
   display: flex;
   flex-direction: row;
@@ -163,26 +148,21 @@ html, body {
   color: white;
 }
 
-/* --------------------------------------------------
-   FLOATING COUNTERS
--------------------------------------------------- */
-
+/* FLOATING COUNTERS */
 .counter-bubble {
   position: absolute;
   top: 10%;
   right: 10%;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.9);
   padding: 10px 20px;
   border-radius: 20px;
   font-size: 1.4rem;
   font-weight: bold;
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  cursor: pointer;
 }
 
-/* --------------------------------------------------
-   MENU BUTTON
--------------------------------------------------- */
-
+/* MENU BUTTON (CENTERED) */
 .menu-btn {
   z-index: 50;
   width: 90px;
@@ -196,14 +176,12 @@ html, body {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-/* --------------------------------------------------
-   MENU OVERLAY
--------------------------------------------------- */
-
+/* MENU OVERLAY */
 #menu-panel {
   position: absolute;
   top: 0;
@@ -236,4 +214,59 @@ html, body {
   border: none;
   background: #ddd;
   cursor: pointer;
+}
+
+/* PLAYER POPUP MENU */
+#player-menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+}
+
+.player-menu-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-menu-content h2 {
+  margin: 0 0 10px;
+}
+
+.player-menu-content label {
+  font-size: 1rem;
+}
+
+.player-menu-content input[type="text"],
+.player-menu-content select {
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.player-menu-content input[type="file"] {
+  font-size: 0.9rem;
+}
+
+.player-menu-content button {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #00aaff;
+  color: white;
+  cursor: pointer;
+}
+
+.player-menu-content button:last-child {
+  background: #999;
 }
