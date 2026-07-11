@@ -1,6 +1,6 @@
-// -----------------------------
-// STATE
-// -----------------------------
+// --------------------------------------------------
+// ELEMENTS
+// --------------------------------------------------
 const homeScreen   = document.getElementById('home-screen');
 const gameScreen   = document.getElementById('game-screen');
 const playerGrid   = document.getElementById('player-grid');
@@ -16,20 +16,51 @@ const resetGameBtn  = document.getElementById('reset-game');
 const returnHomeBtn = document.getElementById('return-home');
 const closeMenuBtn  = document.getElementById('close-menu');
 
+// --------------------------------------------------
+// PLAYER POPUP MENU (NEW)
+// --------------------------------------------------
+let activePlayerId = null;
+
+const playerMenu = document.createElement('div');
+playerMenu.id = 'player-menu';
+playerMenu.classList.add('hidden');
+playerMenu.innerHTML = `
+  <div class="player-menu-content">
+    <h2>Edit Player</h2>
+
+    <label>Name</label>
+    <input type="text" id="player-name-input">
+
+    <label>Counter Type</label>
+    <select id="counter-type">
+      <option value="Poison">Poison</option>
+      <option value="Commander Damage">Commander Damage</option>
+      <option value="Energy">Energy</option>
+      <option value="Experience">Experience</option>
+      <option value="Custom">Custom</option>
+    </select>
+
+    <label>Background Image</label>
+    <input type="file" id="bg-upload" accept="image/*">
+
+    <button id="apply-player-settings">Apply</button>
+    <button id="close-player-menu">Close</button>
+  </div>
+`;
+document.body.appendChild(playerMenu);
+
+// --------------------------------------------------
+// STATE
+// --------------------------------------------------
 let players = [];
 let startingLife = 40;
 let gameType = 'commander';
 
-// -----------------------------
-// UTIL
-// -----------------------------
+// --------------------------------------------------
+// SAVE / LOAD
+// --------------------------------------------------
 function saveState() {
-  const state = {
-    players,
-    startingLife,
-    gameType
-  };
-  localStorage.setItem('mtgState', JSON.stringify(state));
+  localStorage.setItem('mtgState', JSON.stringify({ players, startingLife, gameType }));
 }
 
 function loadState() {
@@ -45,50 +76,14 @@ function loadState() {
   }
 }
 
-function updateLifeDisplay() {
-  players.forEach(p => {
-    const el = document.querySelector(`.life-total[data-player="${p.id}"]`);
-    if (el) el.textContent = p.life;
-  });
-}
-
-function rebuildCounters() {
-  players.forEach(p => {
-    const zone = document.querySelector(`.player-zone[data-player="${p.id}"]`);
-    if (!zone) return;
-    // Remove old bubbles
-    zone.querySelectorAll('.counter-bubble').forEach(b => b.remove());
-    // Add current counters
-    p.counters.forEach(counter => {
-      const bubble = document.createElement('div');
-      bubble.className = 'counter-bubble';
-      bubble.textContent = `${counter.name}: ${counter.value}`;
-      bubble.addEventListener('click', (e) => {
-        e.stopPropagation();
-        // Remove this counter
-        p.counters = p.counters.filter(c => c !== counter);
-        rebuildCounters();
-        saveState();
-      });
-      zone.appendChild(bubble);
-    });
-  });
-}
-
-// -----------------------------
-// BUILD GAME LAYOUT
-// -----------------------------
+// --------------------------------------------------
+// BUILD PLAYER GRID
+// --------------------------------------------------
 function buildPlayerGrid() {
   playerGrid.innerHTML = '';
 
   const count = players.length;
-
-  // Simple grid layout: 2–4 players = 2 columns, 5–6 = 3 columns
-  if (count <= 4) {
-    playerGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-  } else {
-    playerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-  }
+  playerGrid.style.gridTemplateColumns = count <= 4 ? 'repeat(2,1fr)' : 'repeat(3,1fr)';
 
   players.forEach(p => {
     const zone = document.createElement('div');
@@ -102,15 +97,6 @@ function buildPlayerGrid() {
     const nameEl = document.createElement('div');
     nameEl.className = 'player-name';
     nameEl.textContent = p.name;
-    nameEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const newName = prompt('Enter player name:', p.name);
-      if (newName && newName.trim() !== '') {
-        p.name = newName.trim();
-        nameEl.textContent = p.name;
-        saveState();
-      }
-    });
 
     const lifeEl = document.createElement('div');
     lifeEl.className = 'life-total';
@@ -120,94 +106,174 @@ function buildPlayerGrid() {
     const buttonsRow = document.createElement('div');
     buttonsRow.className = 'buttons';
 
-    const btnPlus5 = document.createElement('button');
-    btnPlus5.textContent = '+5';
-    btnPlus5.dataset.player = p.id;
-    btnPlus5.dataset.change = 5;
+    const btns = [
+      { text: '+5', change: 5 },
+      { text: '+1', change: 1 },
+      { text: '⟲', reset: true },
+      { text: '−1', change: -1 },
+      { text: '−5', change: -5 }
+    ];
 
-    const btnPlus1 = document.createElement('button');
-    btnPlus1.textContent = '+1';
-    btnPlus1.dataset.player = p.id;
-    btnPlus1.dataset.change = 1;
-
-    const btnReset = document.createElement('button');
-    btnReset.textContent = '⟲';
-    btnReset.className = 'reset-btn';
-    btnReset.dataset.player = p.id;
-    btnReset.dataset.reset = 'true';
-
-    const btnMinus1 = document.createElement('button');
-    btnMinus1.textContent = '−1';
-    btnMinus1.dataset.player = p.id;
-    btnMinus1.dataset.change = -1;
-
-    const btnMinus5 = document.createElement('button');
-    btnMinus5.textContent = '−5';
-    btnMinus5.dataset.player = p.id;
-    btnMinus5.dataset.change = -5;
-
-    buttonsRow.appendChild(btnPlus5);
-    buttonsRow.appendChild(btnPlus1);
-    buttonsRow.appendChild(btnReset);
-    buttonsRow.appendChild(btnMinus1);
-    buttonsRow.appendChild(btnMinus5);
-
-    // Customize button (name + background)
-    const customizeBtn = document.createElement('button');
-    customizeBtn.textContent = 'Customize';
-    customizeBtn.style.marginTop = '15px';
-    customizeBtn.dataset.player = p.id;
-    customizeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const newName = prompt('Enter player name:', p.name);
-      if (newName && newName.trim() !== '') {
-        p.name = newName.trim();
-        nameEl.textContent = p.name;
-      }
-      const bgUrl = prompt('Enter background image URL (optional):', p.background || '');
-      if (bgUrl && bgUrl.trim() !== '') {
-        p.background = bgUrl.trim();
-        zone.style.backgroundImage = `url("${p.background}")`;
-      }
-      // Simple manual text mode toggle
-      const textMode = prompt('Is this background dark or light? (type "dark" or "light")', 'dark');
-      zone.classList.remove('dark-text', 'light-text');
-      if (textMode === 'light') {
-        zone.classList.add('light-text');
-      } else {
-        zone.classList.add('dark-text');
-      }
-      saveState();
+    btns.forEach(b => {
+      const btn = document.createElement('button');
+      btn.textContent = b.text;
+      btn.dataset.player = p.id;
+      if (b.reset) btn.dataset.reset = 'true';
+      if (b.change) btn.dataset.change = b.change;
+      buttonsRow.appendChild(btn);
     });
 
-    // Click on zone to add counters
+    // Floating counters
+    p.counters.forEach(counter => {
+      const bubble = document.createElement('div');
+      bubble.className = 'counter-bubble';
+      bubble.dataset.player = p.id;
+      bubble.dataset.counter = counter.name;
+      bubble.textContent = `${counter.name}: ${counter.value}`;
+      zone.appendChild(bubble);
+    });
+
+    // Click zone to open player menu
     zone.addEventListener('click', (e) => {
-      // Ignore button clicks
       if (e.target.tagName === 'BUTTON') return;
-      const counterName = prompt('Enter counter name (e.g. Poison, Commander Damage):');
-      if (!counterName || counterName.trim() === '') return;
-      const valueStr = prompt(`Enter value for ${counterName}:`, '1');
-      const value = Number(valueStr) || 1;
-      p.counters.push({ name: counterName.trim(), value });
-      rebuildCounters();
+      if (e.target.classList.contains('counter-bubble')) return;
+
+      activePlayerId = p.id;
+      openPlayerMenu(p);
+    });
+
+    // Click counter bubble to open counter menu
+    zone.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('counter-bubble')) return;
+
+      const counterName = e.target.dataset.counter;
+      const player = players.find(pl => pl.id === p.id);
+      const counter = player.counters.find(c => c.name === counterName);
+
+      const action = prompt(
+        `${counterName}: ${counter.value}\n\nChoose:\n1 = +1\n2 = -1\n3 = Remove Counter`,
+        '1'
+      );
+
+      if (action === '1') counter.value++;
+      if (action === '2') counter.value--;
+      if (action === '3') {
+        player.counters = player.counters.filter(c => c !== counter);
+      }
+
       saveState();
+      buildPlayerGrid();
     });
 
     zone.appendChild(nameEl);
     zone.appendChild(lifeEl);
     zone.appendChild(buttonsRow);
-    zone.appendChild(customizeBtn);
 
     playerGrid.appendChild(zone);
   });
-
-  updateLifeDisplay();
-  rebuildCounters();
 }
 
-// -----------------------------
+// --------------------------------------------------
+// PLAYER MENU LOGIC
+// --------------------------------------------------
+function openPlayerMenu(player) {
+  document.getElementById('player-name-input').value = player.name;
+  document.getElementById('counter-type').value = 'Poison';
+  document.getElementById('bg-upload').value = '';
+
+  playerMenu.classList.remove('hidden');
+}
+
+document.getElementById('close-player-menu').addEventListener('click', () => {
+  playerMenu.classList.add('hidden');
+});
+
+document.getElementById('apply-player-settings').addEventListener('click', () => {
+  const player = players.find(p => p.id === activePlayerId);
+  if (!player) return;
+
+  const newName = document.getElementById('player-name-input').value.trim();
+  const counterType = document.getElementById('counter-type').value;
+  const bgFile = document.getElementById('bg-upload').files[0];
+
+  if (newName) player.name = newName;
+
+  if (counterType === 'Custom') {
+    const customName = prompt('Enter custom counter name:');
+    if (customName) player.counters.push({ name: customName, value: 1 });
+  } else {
+    player.counters.push({ name: counterType, value: 1 });
+  }
+
+  if (bgFile) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      player.background = reader.result;
+      saveState();
+      buildPlayerGrid();
+    };
+    reader.readAsDataURL(bgFile);
+  } else {
+    saveState();
+    buildPlayerGrid();
+  }
+
+  playerMenu.classList.add('hidden');
+});
+
+// --------------------------------------------------
+// LIFE BUTTON HANDLER
+// --------------------------------------------------
+document.addEventListener('click', (event) => {
+  const btn = event.target;
+  if (btn.tagName !== 'BUTTON') return;
+
+  const playerId = btn.dataset.player;
+  if (playerId === undefined) return;
+
+  const player = players.find(p => String(p.id) === String(playerId));
+  if (!player) return;
+
+  if (btn.dataset.reset) {
+    player.life = startingLife;
+  } else if (btn.dataset.change) {
+    player.life += Number(btn.dataset.change);
+  }
+
+  saveState();
+  buildPlayerGrid();
+});
+
+// --------------------------------------------------
+// MENU BUTTON (CENTERED)
+// --------------------------------------------------
+menuBtn.addEventListener('click', () => {
+  menuPanel.classList.remove('hidden');
+});
+
+closeMenuBtn.addEventListener('click', () => {
+  menuPanel.classList.add('hidden');
+});
+
+resetGameBtn.addEventListener('click', () => {
+  players.forEach(p => {
+    p.life = startingLife;
+    p.counters = [];
+  });
+  saveState();
+  buildPlayerGrid();
+  menuPanel.classList.add('hidden');
+});
+
+returnHomeBtn.addEventListener('click', () => {
+  menuPanel.classList.add('hidden');
+  gameScreen.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+});
+
+// --------------------------------------------------
 // START GAME
-// -----------------------------
+// --------------------------------------------------
 startGameBtn.addEventListener('click', () => {
   const count = Number(playerCountSelect.value);
   startingLife = Number(startingLifeSelect.value);
@@ -231,70 +297,16 @@ startGameBtn.addEventListener('click', () => {
   gameScreen.classList.remove('hidden');
 });
 
-// -----------------------------
-// MENU
-// -----------------------------
-menuBtn.addEventListener('click', () => {
-  menuPanel.classList.remove('hidden');
-});
-
-closeMenuBtn.addEventListener('click', () => {
-  menuPanel.classList.add('hidden');
-});
-
-resetGameBtn.addEventListener('click', () => {
-  players.forEach(p => {
-    p.life = startingLife;
-    p.counters = [];
-  });
-  updateLifeDisplay();
-  rebuildCounters();
-  saveState();
-  menuPanel.classList.add('hidden');
-});
-
-returnHomeBtn.addEventListener('click', () => {
-  menuPanel.classList.add('hidden');
-  gameScreen.classList.add('hidden');
-  homeScreen.classList.remove('hidden');
-});
-
-// -----------------------------
-// BUTTON CLICK HANDLER (LIFE)
-// -----------------------------
-document.addEventListener('click', (event) => {
-  const btn = event.target;
-  if (btn.tagName !== 'BUTTON') return;
-
-  const playerId = btn.dataset.player;
-  if (playerId === undefined) return;
-
-  const player = players.find(p => String(p.id) === String(playerId));
-  if (!player) return;
-
-  if (btn.dataset.reset) {
-    player.life = startingLife;
-  } else if (btn.dataset.change) {
-    const change = Number(btn.dataset.change);
-    player.life += change;
-  }
-
-  updateLifeDisplay();
-  saveState();
-});
-
-// -----------------------------
+// --------------------------------------------------
 // INITIAL LOAD
-// -----------------------------
+// --------------------------------------------------
 loadState();
 
 if (players.length > 0) {
-  // Resume game
   buildPlayerGrid();
   homeScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
 } else {
-  // Fresh start
   homeScreen.classList.remove('hidden');
   gameScreen.classList.add('hidden');
 }
