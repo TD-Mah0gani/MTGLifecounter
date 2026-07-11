@@ -7,103 +7,70 @@
 </head>
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- POPUP MENU -->
-    <div id="menu-panel" class="hidden">
-      <div class="menu-content">
-        <button id="toggle-mode">Switch to 2 Player Mode</button>
-        <button id="close-menu">Close</button>
-      </div>
+  <!-- HOME SCREEN -->
+  <div id="home-screen">
+
+    <h1 class="home-title">MTG Life Counter</h1>
+
+    <div class="home-section">
+      <label>Number of Players</label>
+      <select id="player-count">
+        <option value="2">2 Players</option>
+        <option value="3">3 Players</option>
+        <option value="4">4 Players</option>
+        <option value="5">5 Players</option>
+        <option value="6">6 Players</option>
+      </select>
     </div>
 
-    <!-- MAIN CENTER MENU BUTTON (works in both modes) -->
+    <div class="home-section">
+      <label>Starting Life Total</label>
+      <select id="starting-life">
+        <option value="20">20 (Modern / Standard)</option>
+        <option value="40">40 (Commander)</option>
+        <option value="30">30 (Brawl)</option>
+      </select>
+    </div>
+
+    <div class="home-section">
+      <label>Game Type</label>
+      <select id="game-type">
+        <option value="commander">Commander</option>
+        <option value="modern">Modern</option>
+        <option value="standard">Standard</option>
+        <option value="brawl">Brawl</option>
+      </select>
+    </div>
+
+    <button id="start-game" class="home-start-btn">Start Game</button>
+  </div>
+
+
+  <!-- GAME SCREEN (DYNAMICALLY GENERATED) -->
+  <div id="game-screen" class="hidden">
+
+    <!-- MENU BUTTON -->
     <button id="menu-btn" class="menu-btn">☰</button>
 
-    <!-- 4 PLAYER MODE (DEFAULT) -->
-    <div id="four-player" class="four-grid">
-
-      <div class="quad" id="quad-p1">
-        <div class="life" id="p1-life-4">40</div>
-        <div class="buttons">
-          <button data-player="p1" data-change="5">+5</button>
-          <button data-player="p1" data-change="1">+1</button>
-          <button class="reset-btn" data-player="p1" data-reset="true">⟲</button>
-          <button data-player="p1" data-change="-1">−1</button>
-          <button data-player="p1" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 1</h2>
-      </div>
-
-      <div class="quad" id="quad-p2">
-        <div class="life" id="p2-life-4">40</div>
-        <div class="buttons">
-          <button data-player="p2" data-change="5">+5</button>
-          <button data-player="p2" data-change="1">+1</button>
-          <button class="reset-btn" data-player="p2" data-reset="true">⟲</button>
-          <button data-player="p2" data-change="-1">−1</button>
-          <button data-player="p2" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 2</h2>
-      </div>
-
-      <div class="quad" id="quad-p3">
-        <div class="life" id="p3-life-4">40</div>
-        <div class="buttons">
-          <button data-player="p3" data-change="5">+5</button>
-          <button data-player="p3" data-change="1">+1</button>
-          <button class="reset-btn" data-player="p3" data-reset="true">⟲</button>
-          <button data-player="p3" data-change="-1">−1</button>
-          <button data-player="p3" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 3</h2>
-      </div>
-
-      <div class="quad" id="quad-p4">
-        <div class="life" id="p4-life-4">40</div>
-        <div class="buttons">
-          <button data-player="p4" data-change="5">+5</button>
-          <button data-player="p4" data-change="1">+1</button>
-          <button class="reset-btn" data-player="p4" data-reset="true">⟲</button>
-          <button data-player="p4" data-change="-1">−1</button>
-          <button data-player="p4" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 4</h2>
-      </div>
-
-    </div>
-
-    <!-- 2 PLAYER MODE -->
-    <div id="two-player" class="hidden">
-
-      <div class="player">
-        <div class="life" id="p1-life">40</div>
-        <div class="buttons">
-          <button data-player="1" data-change="5">+5</button>
-          <button data-player="1" data-change="1">+1</button>
-          <button class="reset-btn" data-player="1" data-reset="true">⟲</button>
-          <button data-player="1" data-change="-1">−1</button>
-          <button data-player="1" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 1</h2>
-      </div>
-
-      <div class="player">
-        <div class="life" id="p2-life">40</div>
-        <div class="buttons">
-          <button data-player="2" data-change="5">+5</button>
-          <button data-player="2" data-change="1">+1</button>
-          <button class="reset-btn" data-player="2" data-reset="true">⟲</button>
-          <button data-player="2" data-change="-1">−1</button>
-          <button data-player="2" data-change="-5">−5</button>
-        </div>
-        <h2 class="player-name">Player 2</h2>
-      </div>
-
-    </div>
+    <!-- PLAYER GRID (JS will fill this) -->
+    <div id="player-grid"></div>
 
   </div>
 
-  <script src="script.js"></script>
+
+  <!-- MENU OVERLAY -->
+  <div id="menu-panel" class="hidden">
+    <div class="menu-content">
+      <button id="reset-game">Reset Game</button>
+      <button id="return-home">Return to Home Screen</button>
+      <button id="close-menu">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
