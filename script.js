@@ -14,39 +14,9 @@ const resetGameBtn  = document.getElementById('reset-game');
 const returnHomeBtn = document.getElementById('return-home');
 const closeMenuBtn  = document.getElementById('close-menu');
 
-// PLAYER POPUP MENU
-let activePlayerId = null;
-
-const playerMenu = document.createElement('div');
-playerMenu.id = 'player-menu';
-playerMenu.classList.add('hidden');
-playerMenu.innerHTML = `
-  <div class="player-menu-content">
-    <h2>Edit Player</h2>
-
-    <label>Name</label>
-    <input type="text" id="player-name-input">
-
-    <label>Counter Type</label>
-    <select id="counter-type">
-      <option value="Poison">Poison</option>
-      <option value="Commander Damage">Commander Damage</option>
-      <option value="Energy">Energy</option>
-      <option value="Experience">Experience</option>
-      <option value="Custom">Custom</option>
-    </select>
-
-    <label>Background Image</label>
-    <input type="file" id="bg-upload" accept="image/*">
-
-    <button id="apply-player-settings">Apply</button>
-    <button id="close-player-menu">Close</button>
-  </div>
-`;
-document.body.appendChild(playerMenu);
-
+const playerMenu        = document.getElementById('player-menu');
 const playerNameInput   = document.getElementById('player-name-input');
-const counterTypeSelect = document.getElementById('counter-type');
+const counterCheckboxes = document.getElementById('counter-checkboxes');
 const bgUploadInput     = document.getElementById('bg-upload');
 const applyPlayerBtn    = document.getElementById('apply-player-settings');
 const closePlayerBtn    = document.getElementById('close-player-menu');
@@ -55,6 +25,7 @@ const closePlayerBtn    = document.getElementById('close-player-menu');
 let players = [];
 let startingLife = 40;
 let gameType = 'commander';
+let activePlayerId = null;
 
 // SAVE / LOAD
 function saveState() {
@@ -119,51 +90,59 @@ function buildPlayerGrid() {
       buttonsRow.appendChild(btn);
     });
 
-    // Floating counters
+    // Counter list container
+    const counterList = document.createElement('div');
+    counterList.className = 'counter-list';
+
     p.counters.forEach(counter => {
       const bubble = document.createElement('div');
       bubble.className = 'counter-bubble';
       bubble.dataset.player = p.id;
       bubble.dataset.counter = counter.name;
-      bubble.textContent = `${counter.name}: ${counter.value}`;
-      zone.appendChild(bubble);
+
+      const minusBtn = document.createElement('button');
+      minusBtn.className = 'counter-minus';
+      minusBtn.textContent = '−';
+
+      const plusBtn = document.createElement('button');
+      plusBtn.className = 'counter-plus';
+      plusBtn.textContent = '+';
+
+      const label = document.createElement('span');
+      label.textContent = `${counter.name}: ${counter.value}`;
+
+      minusBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        counter.value--;
+        saveState();
+        buildPlayerGrid();
+      });
+
+      plusBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        counter.value++;
+        saveState();
+        buildPlayerGrid();
+      });
+
+      bubble.appendChild(minusBtn);
+      bubble.appendChild(label);
+      bubble.appendChild(plusBtn);
+
+      counterList.appendChild(bubble);
     });
 
-    // Click zone (not buttons, not bubbles) → open player menu
+    // Click zone (not buttons) → open player menu
     zone.addEventListener('click', (e) => {
       if (e.target.tagName === 'BUTTON') return;
-      if (e.target.classList.contains('counter-bubble')) return;
-
       activePlayerId = p.id;
       openPlayerMenu(p);
-    });
-
-    // Click counter bubble → counter menu
-    zone.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('counter-bubble')) return;
-
-      const counterName = e.target.dataset.counter;
-      const player = players.find(pl => pl.id === p.id);
-      const counter = player.counters.find(c => c.name === counterName);
-
-      const action = prompt(
-        `${counterName}: ${counter.value}\n\nChoose:\n1 = +1\n2 = -1\n3 = Remove Counter`,
-        '1'
-      );
-
-      if (action === '1') counter.value++;
-      if (action === '2') counter.value--;
-      if (action === '3') {
-        player.counters = player.counters.filter(c => c !== counter);
-      }
-
-      saveState();
-      buildPlayerGrid();
     });
 
     zone.appendChild(nameEl);
     zone.appendChild(lifeEl);
     zone.appendChild(buttonsRow);
+    zone.appendChild(counterList);
 
     playerGrid.appendChild(zone);
   });
@@ -172,8 +151,14 @@ function buildPlayerGrid() {
 // PLAYER MENU
 function openPlayerMenu(player) {
   playerNameInput.value = player.name;
-  counterTypeSelect.value = 'Poison';
   bgUploadInput.value = '';
+
+  // Set checkboxes based on existing counters
+  const boxes = counterCheckboxes.querySelectorAll('input[type="checkbox"]');
+  boxes.forEach(box => {
+    box.checked = player.counters.some(c => c.name === box.value);
+  });
+
   playerMenu.classList.remove('hidden');
 }
 
@@ -186,18 +171,28 @@ applyPlayerBtn.addEventListener('click', () => {
   if (!player) return;
 
   const newName = playerNameInput.value.trim();
-  const counterType = counterTypeSelect.value;
   const bgFile = bgUploadInput.files[0];
 
   if (newName) player.name = newName;
 
-  if (counterType === 'Custom') {
-    const customName = prompt('Enter custom counter name:');
-    if (customName) player.counters.push({ name: customName.trim(), value: 1 });
-  } else {
-    player.counters.push({ name: counterType, value: 1 });
-  }
+  // Update counters based on checkboxes
+  const boxes = counterCheckboxes.querySelectorAll('input[type="checkbox"]');
+  const selectedNames = [];
+  boxes.forEach(box => {
+    if (box.checked) selectedNames.push(box.value);
+  });
 
+  // Remove counters that are no longer selected
+  player.counters = player.counters.filter(c => selectedNames.includes(c.name));
+
+  // Add missing selected counters
+  selectedNames.forEach(name => {
+    if (!player.counters.some(c => c.name === name)) {
+      player.counters.push({ name, value: 0 });
+    }
+  });
+
+  // Background upload
   if (bgFile) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -235,7 +230,7 @@ document.addEventListener('click', (event) => {
   buildPlayerGrid();
 });
 
-// MENU BUTTON (CENTERED)
+// MENU BUTTON
 menuBtn.addEventListener('click', () => {
   menuPanel.classList.remove('hidden');
 });
