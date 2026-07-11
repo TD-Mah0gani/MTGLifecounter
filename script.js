@@ -1,158 +1,300 @@
 // -----------------------------
-// LIFE TOTALS (LOCAL STORAGE)
+// STATE
 // -----------------------------
-let p1Life = Number(localStorage.getItem('p1Life')) || 40;
-let p2Life = Number(localStorage.getItem('p2Life')) || 40;
+const homeScreen   = document.getElementById('home-screen');
+const gameScreen   = document.getElementById('game-screen');
+const playerGrid   = document.getElementById('player-grid');
+const menuPanel    = document.getElementById('menu-panel');
+const menuBtn      = document.getElementById('menu-btn');
 
-let p1Life4 = Number(localStorage.getItem('p1Life4')) || 40;
-let p2Life4 = Number(localStorage.getItem('p2Life4')) || 40;
-let p3Life4 = Number(localStorage.getItem('p3Life4')) || 40;
-let p4Life4 = Number(localStorage.getItem('p4Life4')) || 40;
+const playerCountSelect = document.getElementById('player-count');
+const startingLifeSelect = document.getElementById('starting-life');
+const gameTypeSelect     = document.getElementById('game-type');
 
+const startGameBtn  = document.getElementById('start-game');
+const resetGameBtn  = document.getElementById('reset-game');
+const returnHomeBtn = document.getElementById('return-home');
+const closeMenuBtn  = document.getElementById('close-menu');
+
+let players = [];
+let startingLife = 40;
+let gameType = 'commander';
 
 // -----------------------------
-// UPDATE DISPLAY
+// UTIL
 // -----------------------------
-function updateDisplay() {
-  // 2-player
-  document.getElementById('p1-life').textContent = p1Life;
-  document.getElementById('p2-life').textContent = p2Life;
-
-  // 4-player
-  document.getElementById('p1-life-4').textContent = p1Life4;
-  document.getElementById('p2-life-4').textContent = p2Life4;
-  document.getElementById('p3-life-4').textContent = p3Life4;
-  document.getElementById('p4-life-4').textContent = p4Life4;
+function saveState() {
+  const state = {
+    players,
+    startingLife,
+    gameType
+  };
+  localStorage.setItem('mtgState', JSON.stringify(state));
 }
 
+function loadState() {
+  const raw = localStorage.getItem('mtgState');
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    players = state.players || [];
+    startingLife = state.startingLife || 40;
+    gameType = state.gameType || 'commander';
+  } catch (e) {
+    console.error('Failed to load state', e);
+  }
+}
+
+function updateLifeDisplay() {
+  players.forEach(p => {
+    const el = document.querySelector(`.life-total[data-player="${p.id}"]`);
+    if (el) el.textContent = p.life;
+  });
+}
+
+function rebuildCounters() {
+  players.forEach(p => {
+    const zone = document.querySelector(`.player-zone[data-player="${p.id}"]`);
+    if (!zone) return;
+    // Remove old bubbles
+    zone.querySelectorAll('.counter-bubble').forEach(b => b.remove());
+    // Add current counters
+    p.counters.forEach(counter => {
+      const bubble = document.createElement('div');
+      bubble.className = 'counter-bubble';
+      bubble.textContent = `${counter.name}: ${counter.value}`;
+      bubble.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Remove this counter
+        p.counters = p.counters.filter(c => c !== counter);
+        rebuildCounters();
+        saveState();
+      });
+      zone.appendChild(bubble);
+    });
+  });
+}
 
 // -----------------------------
-// BUTTON CLICK HANDLER
+// BUILD GAME LAYOUT
+// -----------------------------
+function buildPlayerGrid() {
+  playerGrid.innerHTML = '';
+
+  const count = players.length;
+
+  // Simple grid layout: 2–4 players = 2 columns, 5–6 = 3 columns
+  if (count <= 4) {
+    playerGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  } else {
+    playerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  }
+
+  players.forEach(p => {
+    const zone = document.createElement('div');
+    zone.className = 'player-zone';
+    zone.dataset.player = p.id;
+
+    if (p.background) {
+      zone.style.backgroundImage = `url("${p.background}")`;
+    }
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'player-name';
+    nameEl.textContent = p.name;
+    nameEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newName = prompt('Enter player name:', p.name);
+      if (newName && newName.trim() !== '') {
+        p.name = newName.trim();
+        nameEl.textContent = p.name;
+        saveState();
+      }
+    });
+
+    const lifeEl = document.createElement('div');
+    lifeEl.className = 'life-total';
+    lifeEl.dataset.player = p.id;
+    lifeEl.textContent = p.life;
+
+    const buttonsRow = document.createElement('div');
+    buttonsRow.className = 'buttons';
+
+    const btnPlus5 = document.createElement('button');
+    btnPlus5.textContent = '+5';
+    btnPlus5.dataset.player = p.id;
+    btnPlus5.dataset.change = 5;
+
+    const btnPlus1 = document.createElement('button');
+    btnPlus1.textContent = '+1';
+    btnPlus1.dataset.player = p.id;
+    btnPlus1.dataset.change = 1;
+
+    const btnReset = document.createElement('button');
+    btnReset.textContent = '⟲';
+    btnReset.className = 'reset-btn';
+    btnReset.dataset.player = p.id;
+    btnReset.dataset.reset = 'true';
+
+    const btnMinus1 = document.createElement('button');
+    btnMinus1.textContent = '−1';
+    btnMinus1.dataset.player = p.id;
+    btnMinus1.dataset.change = -1;
+
+    const btnMinus5 = document.createElement('button');
+    btnMinus5.textContent = '−5';
+    btnMinus5.dataset.player = p.id;
+    btnMinus5.dataset.change = -5;
+
+    buttonsRow.appendChild(btnPlus5);
+    buttonsRow.appendChild(btnPlus1);
+    buttonsRow.appendChild(btnReset);
+    buttonsRow.appendChild(btnMinus1);
+    buttonsRow.appendChild(btnMinus5);
+
+    // Customize button (name + background)
+    const customizeBtn = document.createElement('button');
+    customizeBtn.textContent = 'Customize';
+    customizeBtn.style.marginTop = '15px';
+    customizeBtn.dataset.player = p.id;
+    customizeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newName = prompt('Enter player name:', p.name);
+      if (newName && newName.trim() !== '') {
+        p.name = newName.trim();
+        nameEl.textContent = p.name;
+      }
+      const bgUrl = prompt('Enter background image URL (optional):', p.background || '');
+      if (bgUrl && bgUrl.trim() !== '') {
+        p.background = bgUrl.trim();
+        zone.style.backgroundImage = `url("${p.background}")`;
+      }
+      // Simple manual text mode toggle
+      const textMode = prompt('Is this background dark or light? (type "dark" or "light")', 'dark');
+      zone.classList.remove('dark-text', 'light-text');
+      if (textMode === 'light') {
+        zone.classList.add('light-text');
+      } else {
+        zone.classList.add('dark-text');
+      }
+      saveState();
+    });
+
+    // Click on zone to add counters
+    zone.addEventListener('click', (e) => {
+      // Ignore button clicks
+      if (e.target.tagName === 'BUTTON') return;
+      const counterName = prompt('Enter counter name (e.g. Poison, Commander Damage):');
+      if (!counterName || counterName.trim() === '') return;
+      const valueStr = prompt(`Enter value for ${counterName}:`, '1');
+      const value = Number(valueStr) || 1;
+      p.counters.push({ name: counterName.trim(), value });
+      rebuildCounters();
+      saveState();
+    });
+
+    zone.appendChild(nameEl);
+    zone.appendChild(lifeEl);
+    zone.appendChild(buttonsRow);
+    zone.appendChild(customizeBtn);
+
+    playerGrid.appendChild(zone);
+  });
+
+  updateLifeDisplay();
+  rebuildCounters();
+}
+
+// -----------------------------
+// START GAME
+// -----------------------------
+startGameBtn.addEventListener('click', () => {
+  const count = Number(playerCountSelect.value);
+  startingLife = Number(startingLifeSelect.value);
+  gameType = gameTypeSelect.value;
+
+  players = [];
+  for (let i = 0; i < count; i++) {
+    players.push({
+      id: i,
+      name: `Player ${i + 1}`,
+      life: startingLife,
+      background: '',
+      counters: []
+    });
+  }
+
+  saveState();
+  buildPlayerGrid();
+
+  homeScreen.classList.add('hidden');
+  gameScreen.classList.remove('hidden');
+});
+
+// -----------------------------
+// MENU
+// -----------------------------
+menuBtn.addEventListener('click', () => {
+  menuPanel.classList.remove('hidden');
+});
+
+closeMenuBtn.addEventListener('click', () => {
+  menuPanel.classList.add('hidden');
+});
+
+resetGameBtn.addEventListener('click', () => {
+  players.forEach(p => {
+    p.life = startingLife;
+    p.counters = [];
+  });
+  updateLifeDisplay();
+  rebuildCounters();
+  saveState();
+  menuPanel.classList.add('hidden');
+});
+
+returnHomeBtn.addEventListener('click', () => {
+  menuPanel.classList.add('hidden');
+  gameScreen.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+});
+
+// -----------------------------
+// BUTTON CLICK HANDLER (LIFE)
 // -----------------------------
 document.addEventListener('click', (event) => {
   const btn = event.target;
   if (btn.tagName !== 'BUTTON') return;
 
-  const player = btn.dataset.player;
+  const playerId = btn.dataset.player;
+  if (playerId === undefined) return;
 
-  function saveAll() {
-    localStorage.setItem('p1Life', p1Life);
-    localStorage.setItem('p2Life', p2Life);
+  const player = players.find(p => String(p.id) === String(playerId));
+  if (!player) return;
 
-    localStorage.setItem('p1Life4', p1Life4);
-    localStorage.setItem('p2Life4', p2Life4);
-    localStorage.setItem('p3Life4', p3Life4);
-    localStorage.setItem('p4Life4', p4Life4);
-  }
-
-  // RESET BUTTON
   if (btn.dataset.reset) {
-
-    // 2-player resets
-    if (player === '1') p1Life = 40;
-    if (player === '2') p2Life = 40;
-
-    // 4-player resets
-    if (player === 'p1') p1Life4 = 40;
-    if (player === 'p2') p2Life4 = 40;
-    if (player === 'p3') p3Life4 = 40;
-    if (player === 'p4') p4Life4 = 40;
-
-    saveAll();
-
+    player.life = startingLife;
   } else if (btn.dataset.change) {
-
     const change = Number(btn.dataset.change);
-
-    // 2-player changes
-    if (player === '1') p1Life += change;
-    if (player === '2') p2Life += change;
-
-    // 4-player changes
-    if (player === 'p1') p1Life4 += change;
-    if (player === 'p2') p2Life4 += change;
-    if (player === 'p3') p3Life4 += change;
-    if (player === 'p4') p4Life4 += change;
-
-    saveAll();
+    player.life += change;
   }
 
-  updateDisplay();
+  updateLifeDisplay();
+  saveState();
 });
 
+// -----------------------------
+// INITIAL LOAD
+// -----------------------------
+loadState();
 
-// -----------------------------
-// SERVICE WORKER
-// -----------------------------
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .catch(console.error);
+if (players.length > 0) {
+  // Resume game
+  buildPlayerGrid();
+  homeScreen.classList.add('hidden');
+  gameScreen.classList.remove('hidden');
+} else {
+  // Fresh start
+  homeScreen.classList.remove('hidden');
+  gameScreen.classList.add('hidden');
 }
-
-
-// -----------------------------
-// MODE SWITCHING (NOW IN MENU)
-// -----------------------------
-const twoPlayerDiv = document.getElementById('two-player');
-const fourPlayerDiv = document.getElementById('four-player');
-const toggleBtn = document.getElementById('toggle-mode');
-
-
-// -----------------------------
-// MENU BUTTON + POPUP (OPTION B FIX)
-// -----------------------------
-const menuPanel = document.getElementById('menu-panel');
-const closeMenu = document.getElementById('close-menu');
-
-// Listen to BOTH menu buttons:
-// - The main one: id="menu-btn"
-// - Any duplicates: class="menu-btn"
-document.querySelectorAll('#menu-btn, .menu-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    menuPanel.classList.remove('hidden');
-  });
-});
-
-// Close menu
-closeMenu.addEventListener('click', () => {
-  menuPanel.classList.add('hidden');
-});
-
-
-// -----------------------------
-// TOGGLE MODE (INSIDE MENU)
-// -----------------------------
-toggleBtn.addEventListener('click', () => {
-
-  if (fourPlayerDiv.classList.contains('hidden')) {
-    // Switch to 4-player
-    twoPlayerDiv.classList.add('hidden');
-    fourPlayerDiv.classList.remove('hidden');
-    toggleBtn.textContent = "Switch to 2 Player Mode";
-  } else {
-    // Switch to 2-player
-    fourPlayerDiv.classList.add('hidden');
-    twoPlayerDiv.classList.remove('hidden');
-    toggleBtn.textContent = "Switch to 4 Player Mode";
-  }
-
-  // Close menu after switching
-  menuPanel.classList.add('hidden');
-});
-
-
-// -----------------------------
-// START IN 4-PLAYER MODE
-// -----------------------------
-twoPlayerDiv.classList.add('hidden');
-fourPlayerDiv.classList.remove('hidden');
-
-// Remove title if it exists
-const title = document.getElementById('title');
-if (title) title.remove();
-
-
-// -----------------------------
-// INITIAL DISPLAY UPDATE
-// -----------------------------
-updateDisplay();
