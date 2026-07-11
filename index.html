@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-">
 <head>
   <meta charset="UTF-8">
   <title>MTG Life Counter</title>
@@ -49,9 +48,7 @@
 
   <!-- GAME SCREEN -->
   <div id="game-screen" class="hidden">
-    <!-- Center menu button -->
     <button id="menu-btn" class="menu-btn">☰</button>
-    <!-- Dynamic player grid -->
     <div id="player-grid"></div>
   </div>
 
@@ -61,6 +58,30 @@
       <button id="reset-game">Reset Game</button>
       <button id="return-home">Return to Home Screen</button>
       <button id="close-menu">Close</button>
+    </div>
+  </div>
+
+  <!-- PLAYER POPUP MENU -->
+  <div id="player-menu" class="hidden">
+    <div class="player-menu-content">
+      <h2>Edit Player</h2>
+
+      <label>Name</label>
+      <input type="text" id="player-name-input">
+
+      <label>Counters</label>
+      <div id="counter-checkboxes">
+        <label><input type="checkbox" value="Poison"> Poison</label>
+        <label><input type="checkbox" value="Experience"> Experience</label>
+        <label><input type="checkbox" value="Energy"> Energy</label>
+        <label><input type="checkbox" value="Ticket"> Ticket</label>
+      </div>
+
+      <label>Background Image</label>
+      <input type="file" id="bg-upload" accept="image/*">
+
+      <button id="apply-player-settings">Apply</button>
+      <button id="close-player-menu">Close</button>
     </div>
   </div>
 
