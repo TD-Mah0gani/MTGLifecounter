@@ -1,24 +1,20 @@
-// --------------------------------------------------
 // ELEMENTS
-// --------------------------------------------------
 const homeScreen   = document.getElementById('home-screen');
 const gameScreen   = document.getElementById('game-screen');
 const playerGrid   = document.getElementById('player-grid');
 const menuPanel    = document.getElementById('menu-panel');
 const menuBtn      = document.getElementById('menu-btn');
 
-const playerCountSelect = document.getElementById('player-count');
-const startingLifeSelect = document.getElementById('starting-life');
-const gameTypeSelect     = document.getElementById('game-type');
+const playerCountSelect   = document.getElementById('player-count');
+const startingLifeSelect  = document.getElementById('starting-life');
+const gameTypeSelect      = document.getElementById('game-type');
 
 const startGameBtn  = document.getElementById('start-game');
 const resetGameBtn  = document.getElementById('reset-game');
 const returnHomeBtn = document.getElementById('return-home');
 const closeMenuBtn  = document.getElementById('close-menu');
 
-// --------------------------------------------------
-// PLAYER POPUP MENU (NEW)
-// --------------------------------------------------
+// PLAYER POPUP MENU
 let activePlayerId = null;
 
 const playerMenu = document.createElement('div');
@@ -49,16 +45,18 @@ playerMenu.innerHTML = `
 `;
 document.body.appendChild(playerMenu);
 
-// --------------------------------------------------
+const playerNameInput   = document.getElementById('player-name-input');
+const counterTypeSelect = document.getElementById('counter-type');
+const bgUploadInput     = document.getElementById('bg-upload');
+const applyPlayerBtn    = document.getElementById('apply-player-settings');
+const closePlayerBtn    = document.getElementById('close-player-menu');
+
 // STATE
-// --------------------------------------------------
 let players = [];
 let startingLife = 40;
 let gameType = 'commander';
 
-// --------------------------------------------------
 // SAVE / LOAD
-// --------------------------------------------------
 function saveState() {
   localStorage.setItem('mtgState', JSON.stringify({ players, startingLife, gameType }));
 }
@@ -76,14 +74,12 @@ function loadState() {
   }
 }
 
-// --------------------------------------------------
 // BUILD PLAYER GRID
-// --------------------------------------------------
 function buildPlayerGrid() {
   playerGrid.innerHTML = '';
 
   const count = players.length;
-  playerGrid.style.gridTemplateColumns = count <= 4 ? 'repeat(2,1fr)' : 'repeat(3,1fr)';
+  playerGrid.style.gridTemplateColumns = count <= 4 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
 
   players.forEach(p => {
     const zone = document.createElement('div');
@@ -133,7 +129,7 @@ function buildPlayerGrid() {
       zone.appendChild(bubble);
     });
 
-    // Click zone to open player menu
+    // Click zone (not buttons, not bubbles) → open player menu
     zone.addEventListener('click', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       if (e.target.classList.contains('counter-bubble')) return;
@@ -142,7 +138,7 @@ function buildPlayerGrid() {
       openPlayerMenu(p);
     });
 
-    // Click counter bubble to open counter menu
+    // Click counter bubble → counter menu
     zone.addEventListener('click', (e) => {
       if (!e.target.classList.contains('counter-bubble')) return;
 
@@ -173,34 +169,31 @@ function buildPlayerGrid() {
   });
 }
 
-// --------------------------------------------------
-// PLAYER MENU LOGIC
-// --------------------------------------------------
+// PLAYER MENU
 function openPlayerMenu(player) {
-  document.getElementById('player-name-input').value = player.name;
-  document.getElementById('counter-type').value = 'Poison';
-  document.getElementById('bg-upload').value = '';
-
+  playerNameInput.value = player.name;
+  counterTypeSelect.value = 'Poison';
+  bgUploadInput.value = '';
   playerMenu.classList.remove('hidden');
 }
 
-document.getElementById('close-player-menu').addEventListener('click', () => {
+closePlayerBtn.addEventListener('click', () => {
   playerMenu.classList.add('hidden');
 });
 
-document.getElementById('apply-player-settings').addEventListener('click', () => {
+applyPlayerBtn.addEventListener('click', () => {
   const player = players.find(p => p.id === activePlayerId);
   if (!player) return;
 
-  const newName = document.getElementById('player-name-input').value.trim();
-  const counterType = document.getElementById('counter-type').value;
-  const bgFile = document.getElementById('bg-upload').files[0];
+  const newName = playerNameInput.value.trim();
+  const counterType = counterTypeSelect.value;
+  const bgFile = bgUploadInput.files[0];
 
   if (newName) player.name = newName;
 
   if (counterType === 'Custom') {
     const customName = prompt('Enter custom counter name:');
-    if (customName) player.counters.push({ name: customName, value: 1 });
+    if (customName) player.counters.push({ name: customName.trim(), value: 1 });
   } else {
     player.counters.push({ name: counterType, value: 1 });
   }
@@ -221,9 +214,7 @@ document.getElementById('apply-player-settings').addEventListener('click', () =>
   playerMenu.classList.add('hidden');
 });
 
-// --------------------------------------------------
-// LIFE BUTTON HANDLER
-// --------------------------------------------------
+// LIFE BUTTONS
 document.addEventListener('click', (event) => {
   const btn = event.target;
   if (btn.tagName !== 'BUTTON') return;
@@ -244,9 +235,7 @@ document.addEventListener('click', (event) => {
   buildPlayerGrid();
 });
 
-// --------------------------------------------------
 // MENU BUTTON (CENTERED)
-// --------------------------------------------------
 menuBtn.addEventListener('click', () => {
   menuPanel.classList.remove('hidden');
 });
@@ -271,9 +260,7 @@ returnHomeBtn.addEventListener('click', () => {
   homeScreen.classList.remove('hidden');
 });
 
-// --------------------------------------------------
 // START GAME
-// --------------------------------------------------
 startGameBtn.addEventListener('click', () => {
   const count = Number(playerCountSelect.value);
   startingLife = Number(startingLifeSelect.value);
@@ -297,9 +284,7 @@ startGameBtn.addEventListener('click', () => {
   gameScreen.classList.remove('hidden');
 });
 
-// --------------------------------------------------
 // INITIAL LOAD
-// --------------------------------------------------
 loadState();
 
 if (players.length > 0) {
