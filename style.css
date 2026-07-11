@@ -148,17 +148,36 @@ html, body {
   color: white;
 }
 
-/* FLOATING COUNTERS */
-.counter-bubble {
+/* COUNTER LIST */
+.counter-list {
   position: absolute;
   top: 10%;
-  right: 10%;
+  right: 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* FLOATING COUNTERS */
+.counter-bubble {
   background: rgba(255,255,255,0.9);
-  padding: 10px 20px;
+  padding: 6px 10px;
   border-radius: 20px;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: bold;
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-bubble button {
+  border: none;
+  background: #ccc;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
   cursor: pointer;
 }
 
@@ -250,6 +269,13 @@ html, body {
   font-size: 1rem;
   border-radius: 8px;
   border: 1px solid #ccc;
+}
+
+#counter-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.95rem;
 }
 
 .player-menu-content input[type="file"] {
